@@ -50,7 +50,6 @@ public class UserController {
         return service.getUserById(id);
     }
 
-
     @PutMapping("/users/{id}")
     public User updateUser(@PathVariable int id, @RequestBody User user) {
         user.setId(id);

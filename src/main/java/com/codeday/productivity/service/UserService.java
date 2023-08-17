@@ -2,6 +2,7 @@ package com.codeday.productivity.service;
 
 import com.codeday.productivity.entity.User;
 import com.codeday.productivity.repository.UserRepository;
+import com.codeday.productivity.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +12,17 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository repository;
+    private final IdGenerator idGenerator;
 
     @Autowired  // Constructor injection
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, IdGenerator idGenerator) {
+
+        this.idGenerator = idGenerator;
         this.repository = repository;
     }
     public User saveUser(User user){
+        int id = idGenerator.generateId();
+        user.setId(id);
         return repository.save(user);
     }
     public List<User> saveUsers(List<User> users){

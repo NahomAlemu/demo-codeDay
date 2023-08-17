@@ -19,8 +19,17 @@ public class GoalService {
         this.repository = repository;
     }
 
-    public Goal saveGoal(Goal goal){
+    public Goal saveGoalForUser(User user, Goal goal){
+
+        goal.setUser(user);
+        user.getGoals().add(goal);
         return repository.save(goal);
+    }
+
+    public void removeGoalForUser(User user, Goal goal) {
+        user.getGoals().remove(goal);
+        goal.setUser(null);
+        repository.delete(goal);
     }
 
     public List<Goal> getAllGoalsByUser(User user){
@@ -35,8 +44,5 @@ public class GoalService {
         return repository.findByUserAndStartDate(user, startDate);
     }
 }
-
-
-
 
 

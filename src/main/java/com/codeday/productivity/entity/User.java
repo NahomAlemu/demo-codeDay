@@ -1,15 +1,14 @@
 package com.codeday.productivity.entity;
-
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -20,7 +19,8 @@ import java.time.Instant;
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customId")
+    @GenericGenerator(name = "customId", strategy = "com.codeday.productivity.util.CustomIdGeneratorWrapper") // custom generator
     private int id;
 
     @Column(nullable = false)
@@ -34,7 +34,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "is_active", columnDefinition = "VARCHAR(1) DEFAULT 'Y'")
+    @Column(columnDefinition = "VARCHAR(1) DEFAULT 'Y'")
     private String isActive;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
@@ -42,6 +42,14 @@ public class User {
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private Instant lastUpdated;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value="user-goal")
+    private List<Goal> goals;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value="user-task")
+    private List<Task> tasks = new ArrayList<>();
 
 }
 

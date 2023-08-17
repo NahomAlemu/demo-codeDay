@@ -1,25 +1,22 @@
 package com.codeday.productivity.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "GOAL_TBL")
+@Table(name = "TASK_TBL")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Goal {
+public class Task {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String title;
@@ -32,27 +29,25 @@ public class Goal {
     @Column(columnDefinition = "TIMESTAMP")
     private Instant endDate;
 
-    @Column(columnDefinition = "TIMESTAMP")
-    private Instant dueDate;
-
     @Column(columnDefinition = "VARCHAR(1) DEFAULT 'N'")
-    private String isComplete;
+    private String isCompleted;
 
     private int progress;
 
     @Column(columnDefinition = "TIMESTAMP")
     private Instant lastUpdated;
 
+    @Column
+    private long timeSpent; // Assuming this represents time in seconds or milliseconds
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id", nullable = false)
+    @JsonBackReference(value="goal-task")
+    private Goal goal;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonBackReference(value="user-goal")
+    @JsonBackReference(value="user-task")
     private User user;
 
-    @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference(value="goal-task")
-    private List<Task> tasks = new ArrayList<>();
-
 }
-
-
-

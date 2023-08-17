@@ -1,5 +1,4 @@
 package com.codeday.productivity.controller;
-
 import com.codeday.productivity.entity.Goal;
 import com.codeday.productivity.entity.User;
 import com.codeday.productivity.service.GoalService;
@@ -30,7 +29,7 @@ public class GoalController {
     public Goal createGoal(@PathVariable int userId, @RequestBody Goal goal){
         User user = userService.getUserById(userId);
         goal.setUser(user);
-        return goalService.saveGoal(goal);
+        return goalService.saveGoalForUser(user, goal);
     }
 
     @GetMapping
