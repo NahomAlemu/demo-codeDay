@@ -20,10 +20,13 @@ public class GoalService {
     }
 
     public Goal saveGoalForUser(User user, Goal goal){
-
         goal.setUser(user);
         user.getGoals().add(goal);
         return repository.save(goal);
+    }
+
+    public Goal getGoalById(int goalId) {
+        return repository.findById(goalId).orElseThrow(() -> new RuntimeException("Goal not found"));
     }
 
     public void removeGoalForUser(User user, Goal goal) {
@@ -31,6 +34,7 @@ public class GoalService {
         goal.setUser(null);
         repository.delete(goal);
     }
+
 
     public List<Goal> getAllGoalsByUser(User user){
         return repository.findByUser(user);
@@ -43,6 +47,5 @@ public class GoalService {
     public List<Goal> getAllGoalsByUserAndStartDate(User user, Instant startDate){
         return repository.findByUserAndStartDate(user, startDate);
     }
+
 }
-
-
