@@ -18,7 +18,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
+      - name: Set up environment variables  
+        run: |
+          echo "D_USERNAME=${{ secrets.D_USERNAME }}" >> $GITHUB_ENV
+          echo "D_PASSWORD=${{ secrets.D_PASSWORD }}" >> $GITHUB_ENV
+          echo "D_DATABASE=${{ secrets.D_DATABASE }}" >> $GITHUB_ENV
+    
       - name: Set up Java version
         uses: actions/setup-java@v3
         with:
