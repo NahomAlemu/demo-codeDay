@@ -7,7 +7,6 @@ import com.codeday.productivity.repository.TaskRepository;
 import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +25,14 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    public Task saveTaskForGoal(Goal goal, Task task) {
+        task.setGoal(goal);
+        return taskRepository.save(task);
+    }
+
     public List<Task> findByGoal(Goal goal) {
         return taskRepository.findByGoal(goal);
     }
-
 
     // Add a task to a specific goal
     public Task addTaskToGoal(Goal goal, Task task) {
@@ -50,23 +53,6 @@ public class TaskService {
     // Fetch all tasks associated with a specific goal
     public List<Task> getTasksByGoal(Goal goal) {
         return taskRepository.findByGoal(goal);
-    }
-
-
-    public Task saveTaskForUserAndGoal(User user, Goal goal, Task task) {
-        if (!goal.getUser().equals(user)) {
-            throw new IllegalArgumentException("Goal does not belong to the specified user");
-        }
-        task.setUser(user);
-        task.setGoal(goal);
-        return taskRepository.save(task);
-    }
-
-    // Removing a task from a user
-    public void removeTaskForUser(User user, Task task) {
-        user.getTasks().remove(task);
-        task.setUser(null);
-        taskRepository.delete(task);
     }
 
     public List<Task> getAllTasksByGoal(Goal goal) {
@@ -102,7 +88,6 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    // Assuming a custom query for filtering, you may need to add an appropriate query to your repository
     public List<Task> filterTasks(User user, String completionStatus, Instant startDate, Instant endDate) {
         return taskRepository.findByCompletionStatusAndDates(user, completionStatus, startDate, endDate);
     }
@@ -115,6 +100,4 @@ public class TaskService {
         }
         taskRepository.deleteById(taskId);
     }
-
-    // Additional custom methods can be added here.
 }

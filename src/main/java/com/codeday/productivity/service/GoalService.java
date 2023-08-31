@@ -34,8 +34,6 @@ public class GoalService {
         goal.setUser(null);
         repository.delete(goal);
     }
-
-
     public List<Goal> getAllGoalsByUser(User user){
         return repository.findByUser(user);
     }

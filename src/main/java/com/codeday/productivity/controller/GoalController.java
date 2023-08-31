@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/users/{userId}/goals")
+@RequestMapping("api/v1/users/{userId}/goals")
 public class GoalController {
 
     private final GoalService goalService;

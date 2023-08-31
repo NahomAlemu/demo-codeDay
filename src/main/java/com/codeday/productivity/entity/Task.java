@@ -16,8 +16,9 @@ import java.time.Instant;
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_sequence")
+    @SequenceGenerator(name = "task_sequence", sequenceName = "task_sequence", allocationSize = 1)
+    private Integer id;
 
     private String title;
 
@@ -44,10 +45,5 @@ public class Task {
     @JoinColumn(name = "goal_id", nullable = false)
     @JsonBackReference(value="goal-task")
     private Goal goal;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @JsonBackReference(value="user-task")
-    private User user;
 
 }

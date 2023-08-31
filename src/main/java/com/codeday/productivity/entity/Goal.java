@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,8 +20,9 @@ import java.util.List;
 public class Goal {
 
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "goal_sequence")
+    @SequenceGenerator(name = "goal_sequence", sequenceName = "goal_sequence", allocationSize = 1)
+    private Integer id;
 
     private String title;
 
@@ -52,7 +54,7 @@ public class Goal {
     @JsonManagedReference(value="goal-task")
     private List<Task> tasks = new ArrayList<>();
 
+    @OneToMany(mappedBy = "goal")
+    private List<Activity> activities;
+
 }
-
-
-
