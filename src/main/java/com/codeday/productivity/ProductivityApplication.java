@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @SpringBootApplication
 @RestController
-@EnableJpaAuditing
 public class ProductivityApplication {
 
 	private static final Logger LOGGER = LogManager.getLogger(ProductivityApplication.class);
