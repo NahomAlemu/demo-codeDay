@@ -42,5 +42,4 @@ public class ProductivityApplication {
 		LOGGER.info("ProductivityApplication started successfully!");
 
 	}
-
 }
