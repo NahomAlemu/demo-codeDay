@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +19,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
  * </p>
  */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
     private static final Logger logger = LogManager.getLogger(SecurityConfig.class);
     /**
@@ -34,11 +36,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .formLogin(withDefaults())
+                .authorizeHttpRequests( auth -> {
+                    auth.requestMatchers("/").permitAll();
+                    auth.anyRequest().authenticated();
+                })
                 .oauth2Login(withDefaults())
-                .authorizeHttpRequests(c -> c.anyRequest().authenticated())
+                .formLogin(withDefaults())
                 .build();
     }
 
