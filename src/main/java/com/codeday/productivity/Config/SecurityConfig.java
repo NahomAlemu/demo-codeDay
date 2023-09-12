@@ -37,19 +37,34 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests( auth -> {
-                    auth.requestMatchers("/").permitAll();
-                    auth.anyRequest().authenticated();
-                })
-                .oauth2Login(withDefaults())
-                .formLogin(withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .build();
-    }
-
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        return http
+//                .authorizeHttpRequests( auth -> {
+//                    auth.requestMatchers("/").permitAll();
+//                    auth.anyRequest().authenticated();
+//                })
+//                .oauth2Login(withDefaults())
+//                .formLogin(withDefaults())
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .build();
+//    }
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeHttpRequests( auth -> {
+//                    auth.requestMatchers("/").permitAll();
+//                    auth.requestMatchers("/api/v1/**").authenticated();
+//                })
+//                .oauth2Login(withDefaults())
+//                .oauth2ResourceServer(oauth2 -> oauth2
+//                        .jwt(jwt -> jwt
+//                                .jwkSetUri("https://www.googleapis.com/oauth2/v1/certs")
+//                        )
+//                )
+//                .csrf(AbstractHttpConfigurer::disable);
+//        return http.build();
+//    }
     @Bean
     ApplicationListener<AuthenticationSuccessEvent> successLogger() {
         return event -> logger.info("success: {}", event.getAuthentication());
