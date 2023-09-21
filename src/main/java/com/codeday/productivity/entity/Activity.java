@@ -62,8 +62,8 @@ public class Activity {
     @Column
     private long duration; // Calculated duration (endTime - startTime) in seconds
 
-    @Column(name = "is_completed", columnDefinition = "VARCHAR(1) DEFAULT 'N'")
-    private String isCompleted;
+    @Column(name = "is_complete", columnDefinition = "VARCHAR(1) DEFAULT 'N'")
+    private String isComplete;
 
     @Column(name = "last_updated",columnDefinition = "TIMESTAMP")
     private Instant lastUpdated;

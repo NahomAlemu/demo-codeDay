@@ -13,7 +13,6 @@ import java.util.Optional;
 
 /**
  * ActivityRepository Interface.
- *
  * This repository interface extends JpaRepository and defines methods for database operations
  * related to the Activity entity.
  *
@@ -40,7 +39,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Integer> {
      * @param goalId The ID of the goal for which to fetch activities.
      * @return List of activities related to the goal ID.
      */
-    List<Activity> findByGoalId(int goalId);
+    List<Activity> findByGoalIdAndUserId(int goalId, int userId);
 
     /**
      * Find activities by associated goal entity.
@@ -54,7 +53,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Integer> {
      * Find activity by associated user and activity ID.
      *
      * @param user The user entity.
-     * @param id The activity ID.
+     * @param id   The activity ID.
      * @return Optional containing the found activity or empty if not found.
      */
     Optional<Activity> findByUserAndId(User user, int id);
@@ -63,18 +62,17 @@ public interface ActivityRepository extends JpaRepository<Activity, Integer> {
      * Find activities by user and completion status.
      *
      * @param user The user entity.
-     * @param isCompleted The completion status (e.g., 'Y' for Yes, 'N' for No).
      * @return List of activities based on the user and completion status.
      */
-    @Query("SELECT a FROM Activity a WHERE a.user = :user AND a.isCompleted = :isCompleted")
-    List<Activity> findByUserAndIsCompleted(User user, String isCompleted);
+    @Query("SELECT a FROM Activity a WHERE a.user = :user AND a.isComplete = :isComplete")
+    List<Activity> findByUserAndIsComplete(User user, String isComplete);
 
     /**
      * Find activities by user and a date range.
      *
-     * @param user The user entity.
+     * @param user      The user entity.
      * @param startDate The start date of the range.
-     * @param endDate The end date of the range.
+     * @param endDate   The end date of the range.
      * @return List of activities falling within the specified date range for the given user.
      */
     List<Activity> findByUserAndStartDateBetween(User user, Instant startDate, Instant endDate);

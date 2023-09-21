@@ -73,16 +73,6 @@ public class ActivityService {
     }
 
     /**
-     * Retrieves all activities associated with a user.
-     *
-     * @param user The user whose activities are to be fetched.
-     * @return List of all activities related to the user.
-     */
-    public List<Activity> getAllActivitiesByUser(User user) {
-        return activityRepository.findByUser(user);
-    }
-
-    /**
      * Finds an activity by its ID and validates if it belongs to the given user.
      *
      * @param activityId The ID of the activity to find.
@@ -123,7 +113,7 @@ public class ActivityService {
         }
 
         // Update the activity to indicate it has started
-        activity.setIsCompleted("N");
+        activity.setIsComplete("N");
         activity.setStartTime(Instant.now());
 
         return activityRepository.save(activity);
@@ -192,18 +182,97 @@ public class ActivityService {
      * @param updatedActivity The activity with updated information.
      * @return The updated activity.
      */
-    public Activity updateActivity(Activity updatedActivity) {
-        LOGGER.info("Attempting to update activity with ID: {}", updatedActivity.getId());
+    public Activity updateActivity(int id, Activity updatedActivity) {
+        LOGGER.info("Attempting to update activity with ID: {}", id);
 
-        Activity existingActivity = getActivityById(updatedActivity.getId());
+        Activity existingActivity = getActivityById(id);
 
-        // Update properties here. Assuming Activity has a description field.
-        existingActivity.setDescription(updatedActivity.getDescription());
+        if (updatedActivity.getDescription() != null || existingActivity.getDescription() == null) {
+            existingActivity.setDescription(updatedActivity.getDescription());
+        }
+
+        if (updatedActivity.getTitle() != null || existingActivity.getTitle() == null) {
+            existingActivity.setTitle(updatedActivity.getTitle());
+        }
+
+        if (updatedActivity.getIsComplete() != null || existingActivity.getIsComplete() == null) {
+            existingActivity.setIsComplete(updatedActivity.getIsComplete());
+        }
+
+        if (updatedActivity.getType() != null || existingActivity.getType() == null) {
+            existingActivity.setType(updatedActivity.getType());
+        }
 
         Activity savedActivity = activityRepository.save(existingActivity);
         LOGGER.info("Successfully updated activity with ID: {}", savedActivity.getId());
 
         return savedActivity;
+    }
+
+    /**
+     * Fetches the activities associated with a specific goal ID for a given user.
+     *
+     * @param goalId The ID of the goal for which activities are being fetched.
+     * @param user The User object representing the user for whom activities need to be fetched.
+     * @return A list of activities that are associated with the specified goal ID and user.
+     */
+    public List<Activity> findByGoalId(int goalId, User user) {
+        return activityRepository.findByGoalIdAndUserId(goalId, user.getId());
+    }
+
+    /**
+     * Fetches the activities for a given user based on their completion status.
+     *
+     * @param user The User object representing the user for whom activities need to be fetched.
+     * @param isComplete The completion status ('Y' for complete, 'N' for not complete) to filter the activities.
+     * @return A list of activities that match the specified completion status and user.
+     */
+    public List<Activity> findByUserAndIsComplete(User user, String isComplete) {
+        return activityRepository.findByUserAndIsComplete(user, isComplete);
+    }
+
+    /**
+     * Fetches the activities for a given user that fall within a specified date range.
+     *
+     * @param user The User object representing the user for whom activities need to be fetched.
+     * @param startDate The starting date (as an Instant object) of the date range.
+     * @param endDate The ending date (as an Instant object) of the date range.
+     * @return A list of activities that fall within the specified date range for the given user.
+     */
+    public List<Activity> findByUserAndStartDateBetween(User user, Instant startDate, Instant endDate) {
+        return activityRepository.findByUserAndStartDateBetween(user, startDate, endDate);
+    }
+
+    /**
+     * Fetches the activities associated with a specific goal.
+     *
+     * @param goal The Goal object for which activities are being fetched.
+     * @return A list of activities that are associated with the specified goal.
+     */
+    public List<Activity> findByGoal(Goal goal) {
+        return activityRepository.findByGoal(goal);
+    }
+
+    /**
+     * Fetches an activity by its ID for a specific user.
+     *
+     * @param user The User object representing the user for whom the activity is being fetched.
+     * @param activityId The ID of the activity to be fetched.
+     * @return The activity that matches the specified ID and user.
+     * @throws ActivityNotFoundException If the activity with the given ID is not found for the user.
+     */
+    public Activity findByUserAndId(User user, int activityId) {
+        return activityRepository.findByUserAndId(user, activityId).orElseThrow(() -> new ActivityNotFoundException("Activity not found for the user"));
+    }
+
+    /**
+     * Fetches all activities for a given user.
+     *
+     * @param user The User object representing the user for whom activities are being fetched.
+     * @return A list of all activities that are associated with the specified user.
+     */
+    public List<Activity> getAllActivitiesByUser(User user) {
+        return activityRepository.findByUser(user);
     }
 
     /**

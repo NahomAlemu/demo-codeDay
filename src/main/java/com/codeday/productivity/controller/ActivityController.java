@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -62,10 +64,31 @@ public class ActivityController {
     }
 
     /**
-     * Fetches all activities by a specific user.
+     * Fetches the activities associated with a specific goal ID for a given user.
      *
-     * @param userId User ID
-     * @return ResponseEntity with a list of activities or an error message.
+     * @param userId The ID of the user for whom the activities need to be fetched.
+     * @param goalId The ID of the goal for which activities are being fetched.
+     * @return A ResponseEntity containing a list of activities for the specified goal ID
+     *         and HTTP status OK, or an error message and HTTP status INTERNAL_SERVER_ERROR.
+     */
+    @GetMapping("/goal/{goalId}")
+    public ResponseEntity<?> getActivitiesByGoalId(@PathVariable int userId, @PathVariable int goalId) {
+        try {
+            User user = userService.getUserById(userId);
+            List<Activity> activities = activityService.findByGoalId(goalId, user);
+            return new ResponseEntity<>(activities, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error fetching activities by goal ID", e);
+            return new ResponseEntity<>("Error fetching activities", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Fetches all activities for a user specified by the user ID.
+     *
+     * @param userId The ID of the user for whom the activities are to be fetched.
+     * @return A ResponseEntity containing a list of activities associated with the user
+     *         if the operation is successful, or an error message otherwise.
      */
     @GetMapping
     public ResponseEntity<?> getAllActivitiesByUser(@PathVariable int userId) {
@@ -75,6 +98,49 @@ public class ActivityController {
             return new ResponseEntity<>(activities, HttpStatus.OK);
         } catch (Exception e) {
             logger.error("Error fetching activities", e);
+            return new ResponseEntity<>("Error fetching activities", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Fetches the activities for a given user based on their completion status.
+     *
+     * @param userId The ID of the user for whom the activities need to be fetched.
+     * @param isComplete The completion status to filter the activities.
+     * @return A ResponseEntity containing a list of activities that match the completion status
+     *         and HTTP status OK, or an error message and HTTP status INTERNAL_SERVER_ERROR.
+     */
+    @GetMapping("/status/{isComplete}")
+    public ResponseEntity<?> getActivitiesByCompletionStatus(@PathVariable int userId, @PathVariable String isComplete) {
+        try {
+            User user = userService.getUserById(userId);
+            List<Activity> activities = activityService.findByUserAndIsComplete(user, isComplete);
+            return new ResponseEntity<>(activities, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error fetching activities by completion status", e);
+            return new ResponseEntity<>("Error fetching activities", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Fetches the activities for a given user that fall within a specified date range.
+     *
+     * @param userId The ID of the user for whom the activities need to be fetched.
+     * @param startDate The starting date of the date range.
+     * @param endDate The ending date of the date range.
+     * @return A ResponseEntity containing a list of activities that fall within the date range
+     *         and HTTP status OK, or an error message and HTTP status INTERNAL_SERVER_ERROR.
+     */
+    @GetMapping("/date-range")
+    public ResponseEntity<?> getActivitiesByDateRange(@PathVariable int userId,
+                                                      @RequestParam("startDate") Instant startDate,
+                                                      @RequestParam("endDate") Instant endDate) {
+        try {
+            User user = userService.getUserById(userId);
+            List<Activity> activities = activityService.findByUserAndStartDateBetween(user, startDate, endDate);
+            return new ResponseEntity<>(activities, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error fetching activities by date range", e);
             return new ResponseEntity<>("Error fetching activities", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -139,16 +205,15 @@ public class ActivityController {
                                             @RequestBody Activity updatedActivity) {
         try {
             User user = userService.getUserById(userId);
-            if (activityId != updatedActivity.getId()) {
-                return new ResponseEntity<>("Activity ID mismatch", HttpStatus.BAD_REQUEST);
-            }
 
-            Activity existingActivity = activityService.findActivityByIdAndUser(activityId, user);
+            // Set the ID from the path into updatedActivity
+            updatedActivity.setId(activityId);
 
-            // Update existingActivity using values from updatedActivity
-            existingActivity.setDescription(updatedActivity.getDescription());
+            // Validate if the activity exists and belongs to the user
+            activityService.findActivityByIdAndUser(activityId, user);
 
-            Activity savedActivity = activityService.updateActivity(existingActivity);
+            // Delegate all updates to the updateActivity method in the service layer
+            Activity savedActivity = activityService.updateActivity(activityId, updatedActivity);
             return new ResponseEntity<>(savedActivity, HttpStatus.OK);
         } catch (ActivityNotFoundException | UnauthorizedException e) {
             logger.error(e.getMessage(), e);
